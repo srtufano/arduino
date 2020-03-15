@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include <Time.h>
 #include <TimeLib.h>
+#include <DS3231.h>
 
 
 /*
@@ -13,10 +14,6 @@
 LedControl lc = LedControl(12, 10, 11, 2);
 
 byte mm1, mm5, h, m, s;
-byte ultM = 10, ultH = 10;
-byte hPin = 7, mPin = 6;
-boolean ajustaH = true, ajustaM = true;
-
 
 void setup() {
   lc.shutdown(0, false);      // power-saving mode on startup
@@ -25,15 +22,17 @@ void setup() {
   lc.shutdown(1, false);      // power-saving mode on startup
   lc.setIntensity(1, 0);     // Set the brightness to maximum value
   lc.clearDisplay(1);         // and clear the display
+  }
 
 
+void loop() {
 
+  Display();
+  delay(1000);
 
-  Serial.begin(9600);
-  pinMode(hPin, INPUT_PULLUP);
-  pinMode(mPin, INPUT_PULLUP);
 }
 
+//===================== FUNÇÕES =======================
 void Display() {
   /* here is the data for the characters */
   // 0-9
@@ -109,37 +108,9 @@ void Display() {
   byte fiftynine[8] = {0x00, 0x5C, 0x54, 0x74, 0x00, 0x5C, 0x54, 0x7C}; //59
 
   // Setup of Hours & Minutes
-  ajustaH = digitalRead(hPin);
-  ajustaM = digitalRead(mPin);
-
-  if (!ajustaH) {
-    adjustTime(3600);
-  }
-
-  if (!ajustaM) {
-    adjustTime(60);
-  }
-
-  h = hour();
-  m = minute();
-  Serial.print (hour());
-  Serial.print(":");
-  Serial.print (minute());
-  Serial.print(":");
-  Serial.print (second());
-  Serial.println();
-
-  delay(000);
-
-  if ( h > 24)
-  {
-    h = (h - 24);
-  }
-
-
 
   // now set hour
-   if (h == 0)
+  if (h == 0)
   {
     for (int n = 0; n < 8; n++) {
       lc.setRow(0, n, zero[n]);
@@ -328,7 +299,7 @@ void Display() {
 
   }
 
- 
+
 
   // now set minute
   if (m == 0)
@@ -803,10 +774,4 @@ void Display() {
     }
 
   }
-}
-void loop() {
-
-  Display();
-  delay(1000);
-
 }
